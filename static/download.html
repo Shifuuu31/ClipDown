@@ -32,11 +32,12 @@
             background-color: #fff;
             border-radius: 1rem;
             box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-            text-align: center;
             padding: 2rem 1.5rem;
             display: flex;
             flex-direction: row;
             gap: 20px;
+            text-align: center;
+            position: relative;
         }
 
         /* Header Styling */
@@ -44,13 +45,6 @@
             font-size: 1.8rem;
             font-weight: bold;
             color: #7D4CDB;
-        }
-
-        /* Main Title */
-        main h2 {
-            font-size: 1.5rem;
-            margin: 1.5rem 0;
-            color: #333;
         }
 
         /* Video details section */
@@ -114,6 +108,24 @@
             transform: translateY(-2px);
         }
 
+        /* Back Button Styling */
+        .back-btn {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background-color: #E2E8F0;
+            color: #333;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #CBD5E0;
+        }
+
         /* Footer Styling */
         footer {
             margin-top: 2rem;
@@ -123,11 +135,52 @@
             font-size: 0.8rem;
             color: #7D4CDB;
         }
+
+        /* Responsive styling */
+        @media (max-width: 720px) {
+            .container {
+                flex-direction: column;
+                text-align: center;
+            }
+            .video-details,
+            .formats {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1rem;
+            }
+            .video-details h2 {
+                font-size: 1.3rem;
+            }
+            .formats h2, .formats h4 {
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .back-btn {
+                font-size: 0.8rem;
+                padding: 0.3rem 0.6rem;
+            }
+            .video-details h2, .formats h2 {
+                font-size: 1.1rem;
+            }
+            .format-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
+        <!-- Back button -->
+        <button class="back-btn" onclick="history.back()">Back</button>
+
         <!-- Video details section -->
         <div class="video-details">
             <h2>{{.Title}}</h2>
@@ -136,37 +189,38 @@
             <p>Description: {{.Description}}</p>
         </div>
 
+        <!-- Formats section -->
         <div class="formats">
             <h2>Audio Formats</h2>
             <h4>MP3</h4>
             {{range .Mp3}}
-                <form action="/downloadAudio" method="GET">
-                    <!-- Hidden field to pass the selected audio quality -->
-                    <input type="hidden" name="quality-size" value="{{.AudioQuality}}-{{.ContentLength}}">
-                    <button type="submit" class="format-btn" data-content-length="{{.ContentLength}}">{{.AudioQuality}} - {{.ContentLength}} Bytes</button>
-                </form>
+            <form action="/downloadAudio" method="GET">
+                <input type="hidden" name="quality-size" value="{{.AudioQuality}}-{{.ContentLength}}">
+                <button type="submit" class="format-btn" data-content-length="{{.ContentLength}}">{{.AudioQuality}} - {{.ContentLength}} Bytes</button>
+            </form>
             {{end}}
 
             <h2>Video Formats</h2>
             <h4>MP4</h4>
             {{range .Mp4}}
-                <form action="/downloadMp4" method="GET">
-                    <!-- Hidden field to pass the selected video quality -->
-                    <input type="hidden" name="quality-size" value="{{.QualityLabel}}-{{.ContentLength}}">
-                    <button class="format-btn" data-content-length="{{.ContentLength}}">{{.QualityLabel}} - {{.ContentLength}} Bytes</button>
-                </form>
+            <form action="/downloadMp4" method="GET">
+                <input type="hidden" name="quality-size" value="{{.QualityLabel}}-{{.ContentLength}}">
+                <button class="format-btn" data-content-length="{{.ContentLength}}">{{.QualityLabel}} - {{.ContentLength}} Bytes</button>
+            </form>
             {{end}}
 
             <h4>WEBM</h4>
             {{range .Webm}}
-                <form action="/downloadWebm" method="GET">
-                    <!-- Hidden field to pass the selected video quality -->
-                    <input type="hidden" name="quality-size" value="{{.QualityLabel}}-{{.ContentLength}}">
-                    <button class="format-btn" data-content-length="{{.ContentLength}}">{{.QualityLabel}} - {{.ContentLength}} Bytes</button>
-                </form>
+            <form action="/downloadWebm" method="GET">
+                <input type="hidden" name="quality-size" value="{{.QualityLabel}}-{{.ContentLength}}">
+                <button class="format-btn" data-content-length="{{.ContentLength}}">{{.QualityLabel}} - {{.ContentLength}} Bytes</button>
+            </form>
             {{end}}
         </div>
-        <p>Made with 💜 by Shifuuu</p>
+        
+        <footer>
+            <p>Made with 💜 by <a target="_blank" href="https://github.com/Shifuuu31">Shifuuu</a></p>
+        </footer>
     </div>
 
     <script>
@@ -175,11 +229,10 @@
             return (bytes / (1024 * 1024)).toFixed(2);
         }
 
-        // Get all the buttons with content-length data
+        // Update button sizes
         document.querySelectorAll('.format-btn').forEach(button => {
             const contentLength = button.getAttribute('data-content-length');
             const contentLengthMB = bytesToMB(contentLength);
-            // Update the button text to show the size in MB
             button.textContent = button.textContent.replace(contentLength + ' Bytes', contentLengthMB + ' MB');
         });
     </script>
