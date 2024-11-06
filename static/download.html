@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Video</title>
+    <style>
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Body Styling */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #F3F4F6;
+            color: #333;
+            padding: 20px;
+        }
+
+        /* Container Styling */
+        .container {
+            width: 90%;
+            max-width: 900px;
+            background-color: #fff;
+            border-radius: 1rem;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+        }
+
+        /* Header Styling */
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #7D4CDB;
+        }
+
+        /* Main Title */
+        main h2 {
+            font-size: 1.5rem;
+            margin: 1.5rem 0;
+            color: #333;
+        }
+
+        /* Video details section */
+        .video-details {
+            width: 35%;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .video-details h2 {
+            font-size: 1.5rem;
+            color: #7D4CDB;
+        }
+
+        .video-details img {
+            width: 100%;
+            max-width: 300px;
+            border-radius: 0.5rem;
+        }
+
+        .video-details p {
+            font-size: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* Formats section */
+        .formats {
+            width: 65%;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .formats h2 {
+            font-size: 1.2rem;
+            color: #7D4CDB;
+            margin-bottom: 1rem;
+        }
+
+        .formats h4 {
+            font-size: 1rem;
+            color: #555;
+            margin-top: 1rem;
+        }
+
+        /* Format Button Styling */
+        .format-btn {
+            display: inline-block;
+            background-color: #7D4CDB;
+            color: white;
+            font-weight: bold;
+            padding: 0.8rem 1.5rem;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            text-align: center;
+        }
+
+        .format-btn:hover {
+            background-color: #6b38c3;
+            transform: translateY(-2px);
+        }
+
+        /* Footer Styling */
+        footer {
+            margin-top: 2rem;
+        }
+
+        footer p {
+            font-size: 0.8rem;
+            color: #7D4CDB;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Video details section -->
+        <div class="video-details">
+            <h2>{{.Title}}</h2>
+            <img src="{{.Thumbnail}}" alt="Thumbnail">
+            <p>Duration: {{.Duration}}</p>
+            <p>Description: {{.Description}}</p>
+        </div>
+
+        <div class="formats">
+            <h2>Audio Formats</h2>
+            <h4>MP3</h4>
+            {{range .Mp3}}
+                <form action="/downloadAudio" method="GET">
+                    <!-- Hidden field to pass the selected audio quality -->
+                    <input type="hidden" name="quality-size" value="{{.AudioQuality}}-{{.ContentLength}}">
+                    <button type="submit" class="format-btn" data-content-length="{{.ContentLength}}">{{.AudioQuality}} - {{.ContentLength}} Bytes</button>
+                </form>
+            {{end}}
+
+            <h2>Video Formats</h2>
+            <h4>MP4</h4>
+            {{range .Mp4}}
+                <form action="/downloadMp4" method="GET">
+                    <!-- Hidden field to pass the selected video quality -->
+                    <input type="hidden" name="quality-size" value="{{.QualityLabel}}-{{.ContentLength}}">
+                    <button class="format-btn" data-content-length="{{.ContentLength}}">{{.QualityLabel}} - {{.ContentLength}} Bytes</button>
+                </form>
+            {{end}}
+
+            <h4>WEBM</h4>
+            {{range .Webm}}
+                <form action="/downloadWebm" method="GET">
+                    <!-- Hidden field to pass the selected video quality -->
+                    <input type="hidden" name="quality-size" value="{{.QualityLabel}}-{{.ContentLength}}">
+                    <button class="format-btn" data-content-length="{{.ContentLength}}">{{.QualityLabel}} - {{.ContentLength}} Bytes</button>
+                </form>
+            {{end}}
+        </div>
+        <p>Made with 💜 by Shifuuu</p>
+    </div>
+
+    <script>
+        // Function to convert bytes to MB
+        function bytesToMB(bytes) {
+            return (bytes / (1024 * 1024)).toFixed(2);
+        }
+
+        // Get all the buttons with content-length data
+        document.querySelectorAll('.format-btn').forEach(button => {
+            const contentLength = button.getAttribute('data-content-length');
+            const contentLengthMB = bytesToMB(contentLength);
+            // Update the button text to show the size in MB
+            button.textContent = button.textContent.replace(contentLength + ' Bytes', contentLengthMB + ' MB');
+        });
+    </script>
+</body>
+
+</html>
